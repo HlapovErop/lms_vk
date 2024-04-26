@@ -1,0 +1,898 @@
+openapi: 3.0.3
+info:
+  title: API Система управления образовательными курсами heLMSman
+  description: |-
+    Описание ТЗ можно увидеть в [документе с ТЗ](https://drive.google.com/file/d/1Ebto7OIO4k6tQGAqZ5GBml0JPxtt3Iag/view?usp=sharing)
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+tags:
+  - name: user
+    description:  Все действия с пользователем и пользователями
+paths:
+  /users:
+    get:
+      tags:
+        - user
+      summary: Получить всех пользователей
+      description: Используется для получения списка всех пользователей
+      operationId: getUsers
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: JWT токен
+          schema:
+            type: string
+            format: jwt
+      responses:
+        '200':
+          description: Успешно получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+      security:
+        - JWTAuth: [ ]
+  /users/signup:
+    post:
+      tags:
+        - user
+      summary: Создание пользователя
+      description: Используется при регистрации или админом
+      operationId: createUser
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserCreateRequest'
+      responses:
+        '201':
+          description: Успешно создано
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Некорректные параметры
+  /users/login:
+    post:
+      tags:
+        - user
+      summary: Получение JWT токена по юзернейму и паролю
+      description: Используется для авторизации
+      operationId: loginUser
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+              $ref: '#/components/schemas/UserLoginRequest'
+      responses:
+        '200':
+          description: Успешная операция
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLoginResponse'
+        '401':
+          description: Неверное имя пользователя или пароль
+  /users/read/{id}:
+    get:
+      tags:
+        - user
+      summary: Получить пользователя по id
+      description: Применяется при просмотре профиля
+      operationId: getUserById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: Authorization
+          in: header
+          required: true
+          description: JWT токен
+          schema:
+            type: string
+            format: jwt
+      responses:
+        '200':
+          description: Успешно получено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Неавторизован
+        '404':
+          description: Пользователь не найден
+      security:
+        - JWTAuth: [ ]
+  /users/update/{id}:
+    put:
+      tags:
+        - user
+      summary: Обновление пользователя по id
+      description: Доступно администратору или собственнику
+      operationId: updateUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: Authorization
+          in: header
+          required: true
+          description: JWT токен
+          schema:
+            type: string
+            format: jwt
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserUpdateRequest'
+      responses:
+        '200':
+          description: Успешно обновлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Неавторизован
+        '404':
+          description: Пользователь не найден
+      security:
+        - JWTAuth: [ ]
+  /users/delete/{id}:
+    delete:
+      tags:
+        - user
+      summary: Удаление пользователя по id
+      description: Доступно администратору
+      operationId: deleteUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: Authorization
+          in: header
+          required: true
+          description: JWT токен
+          schema:
+            type: string
+            format: jwt
+      responses:
+        '204':
+          description: Успешно удалено
+        '401':
+          description: Неавторизован
+        '404':
+          description: Пользователь не найден
+      security:
+        - JWTAuth: [ ]
+
+
+  /groups/create:
+    post:
+      tags:
+        - groups
+      summary: Создание группы
+      description: Используется для создания новой группы пользователей
+      operationId: createGroup
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: JWT токен
+          schema:
+            type: string
+            format: jwt
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/GroupCreateRequest'
+      security:
+        - JWTAuth: [ ]
+      responses:
+        '201':
+          description: Успешно создано
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '422':
+          description: Некорректные параметры
+  /groups/update/{id}:
+    put:
+      tags:
+        - groups
+      summary: Обновление группы по ID
+      description: Используется для обновления существующей группы по идентификатору
+      operationId: updateGroup
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: Authorization
+          in: header
+          required: true
+          description: JWT токен
+          schema:
+            type: string
+            format: jwt
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/GroupUpdateRequest'
+      responses:
+        '200':
+          description: Успешно обновлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '422':
+          description: Некорректные параметры
+      security:
+        - JWTAuth: [ ]
+  /groups/delete/{id}:
+    delete:
+      tags:
+        - groups
+      summary: Удаление группы по ID
+      description: Используется для удаления существующей группы по идентификатору
+      operationId: deleteGroup
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор группы
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Успешно удалено
+        '403':
+          description: Доступ запрещен
+      security:
+        - JWTAuth: [ ]
+  /groups/{id}:
+    get:
+      tags:
+        - groups
+      summary: Получить группу по ID
+      description: Используется для получения информации о группе по идентификатору
+      operationId: getGroup
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор группы
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Успешно получено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '404':
+          description: Группа не найдена
+      security:
+        - JWTAuth: [ ]
+  /groups/{id}/students/create:
+    post:
+      tags:
+        - groups
+      summary: Добавить студентов в группу
+      description: Используется для добавления студентов в группу по ее идентификатору
+      operationId: addStudents
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: Authorization
+          in: header
+          required: true
+          description: JWT токен
+          schema:
+            type: string
+            format: jwt
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/GroupAddStudentsRequest'
+      responses:
+        '200':
+          description: Успешно добавлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '403':
+          description: Доступ запрещен
+      security:
+        - JWTAuth: [ ]
+  /groups/{id}/students/delete:
+    delete:
+      tags:
+        - groups
+      summary: Удалить студентов из группы
+      description: Используется для удаления студентов из группы по ее идентификатору
+      operationId: deleteStudents
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: Authorization
+          in: header
+          required: true
+          description: JWT токен
+          schema:
+            type: string
+            format: jwt
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/GroupDeleteStudentsRequest'
+      responses:
+        '200':
+          description: Успешно удалено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '403':
+          description: Доступ запрещен
+      security:
+        - JWTAuth: [ ]
+  /groups/{id}/courses/create:
+    post:
+      tags:
+        - groups
+      summary: Добавить курсы в группу
+      description: Используется для добавления курсов в группу по ее идентификатору
+      operationId: addCourses
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: Authorization
+          in: header
+          required: true
+          description: JWT токен
+          schema:
+            type: string
+            format: jwt
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/GroupAddCoursesRequest'
+      responses:
+        '200':
+          description: Успешно добавлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '403':
+          description: Доступ запрещен
+      security:
+        - JWTAuth: [ ]
+  /groups/{id}/courses/delete:
+    delete:
+      tags:
+        - groups
+      summary: Удалить курсы из группы
+      description: Используется для удаления курсов из группы по ее идентификатору
+      operationId: deleteCourses
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: Authorization
+          in: header
+          required: true
+          description: JWT токен
+          schema:
+            type: string
+            format: jwt
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/GroupDeleteCoursesRequest'
+      responses:
+        '200':
+          description: Успешно удалено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '403':
+          description: Доступ запрещен
+      security:
+        - JWTAuth: [ ]
+
+
+  /courses/create:
+    post:
+      summary: Создание нового курса
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: JWT токен
+          schema:
+            type: string
+            format: jwt
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/CourseCreateRequest'
+      responses:
+        '201':
+          description: Успешно создано
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        '400':
+          description: Некорректные параметры
+        '401':
+          description: Не авторизован
+        '403':
+          description: Неподходящая роль
+      security:
+        - JWTAuth: [ ]
+  /courses/update/{id}:
+    put:
+      summary: Обновление данных курса
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Уникальный идентификатор курса
+          schema:
+            type: integer
+            example: 1
+        - name: Authorization
+          in: header
+          required: true
+          description: JWT токен
+          schema:
+            type: string
+            format: jwt
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/components/schemas/CourseUpdateRequest'
+      responses:
+        '200':
+          description: Успешно обновлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        '400':
+          description: Некорректные параметры
+        '401':
+          description: Не авторизован
+        '403':
+          description: Неподходящая роль
+        '404':
+          description: Курс не найден
+      security:
+        - JWTAuth: [ ]
+  /courses/delete/{id}:
+    delete:
+      summary: Удаление курса
+      parameters:
+        - in: header
+          name: Authorization
+          required: true
+          description: JWT токен
+          schema:
+            type: string
+            format: jwt
+        - in: path
+          name: id
+          required: true
+          description: Уникальный идентификатор курса
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '204':
+          description: Успешно удалено
+        '401':
+          description: Не авторизован
+        '403':
+          description: Неподходящая роль
+        '404':
+          description: Курс не найден
+      security:
+        - JWTAuth: [ ]
+  /courses/syllabus/{id}:
+    post:
+      summary: Подписка на курс
+      parameters:
+        - in: header
+          name: Authorization
+          required: true
+          description: JWT токен
+          schema:
+            type: string
+            format: jwt
+        - in: path
+          name: id
+          required: true
+          description: Уникальный идентификатор курса
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '201':
+          description: Успешная подписка
+        '401':
+          description: Не авторизован
+        '404':
+          description: Курс не найден
+      security:
+        - JWTAuth: [ ]
+  /courses/my:
+    get:
+      summary: Получение списка курсов модератора или на которые подписан студент
+      parameters:
+        - in: header
+          name: Authorization
+          required: true
+          description: JWT токен
+          schema:
+            type: string
+            format: jwt
+      responses:
+        '200':
+          description: Успешно получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Course'
+        '401':
+          description: Не авторизован
+      security:
+        - JWTAuth: [ ]
+  /courses/{id}:
+    get:
+      summary: Получение информации о курсе
+      parameters:
+        - in: header
+          name: Authorization
+          required: true
+          description: JWT токен
+          schema:
+            type: string
+            format: jwt
+        - in: path
+          name: id
+          required: true
+          description: Уникальный идентификатор курса
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Успешно получено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        '404':
+          description: Курс не найден
+      security:
+        - JWTAuth: [ ]
+  /courses:
+    get:
+      summary: Получение списка курсов
+      parameters:
+        - in: header
+          name: Authorization
+          required: true
+          description: JWT токен
+          schema:
+            type: string
+            format: jwt
+      responses:
+        '200':
+          description: Успешно получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Course'
+      security:
+        - JWTAuth: [ ]
+
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+        photo:
+          type: string
+        role:
+          type: integer
+      required:
+        - id
+        - name
+        - username
+    UserCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+        email:
+          type: string
+        photo:
+          type: string
+        role:
+          type: integer
+      required:
+        - name
+        - username
+        - password
+    UserLoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          example: admin
+        password:
+          type: string
+          example: admin
+      required:
+        - username
+        - password
+    UserLoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        end_time:
+          type: string
+          format: date-time
+      required:
+        - token
+        - end_time
+    UserUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+        email:
+          type: string
+        photo:
+          type: string
+        role:
+          type: integer
+    Group:
+      type: object
+      properties:
+        id:
+          type: integer
+        students:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        teacher:
+          $ref: '#/components/schemas/User'
+        name:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - teacher
+    GroupCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+      required:
+        - name
+    GroupUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+    GroupAddStudentsRequest:
+      type: object
+      properties:
+        student_ids:
+          type: array
+          items:
+            type: integer
+      required:
+        - student_ids
+    GroupDeleteStudentsRequest:
+      type: object
+      properties:
+        student_ids:
+          type: array
+          items:
+            type: integer
+      required:
+        - student_ids
+    GroupAddCoursesRequest:
+      type: object
+      properties:
+        courses:
+          type: array
+          items:
+            type: object
+            properties:
+              course_id:
+                type: integer
+              passage_time:
+                type: string
+                format: date-time
+      required:
+        - courses
+    GroupDeleteCoursesRequest:
+      type: object
+      properties:
+        course_ids:
+          type: array
+          items:
+            type: integer
+      required:
+        - course_ids
+
+    CourseCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Название курса
+          example: Математика для начинающих
+        description:
+          type: string
+          description: Описание курса
+          example: Курс предназначен для тех, кто только начинает изучать математику.
+        state:
+          type: integer
+          description: Состояние курса (1 - Черновик, 2 - Доступен)
+          example: 1
+        categories:
+          type: array
+          items:
+            type: string
+          description: Категории курса
+          example: [ "Математика", "Образование" ]
+        default_passage_time:
+          type: integer
+          description: Время прохождения курса по умолчанию (в днях)
+          example: 30
+        lessons:
+          type: array
+          items:
+            type: string
+          description: Уроки курса
+          example: [ ]
+    Course:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Уникальный идентификатор курса
+          example: 1
+        name:
+          type: string
+          description: Название курса
+          example: Математика для начинающих
+        description:
+          type: string
+          description: Описание курса
+          example: Курс предназначен для тех, кто только начинает изучать математику.
+        categories:
+          type: array
+          items:
+            type: string
+          description: Категории курса
+          example: [ "Математика", "Образование" ]
+        default_passage_time:
+          type: integer
+          description: Время прохождения курса по умолчанию (в днях)
+          example: 30
+        lessons:
+          type: array
+          items:
+            type: integer
+          description: Уроки курса
+    CourseUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Название курса
+          example: Математика для начинающих
+        description:
+          type: string
+          description: Описание курса
+          example: Курс предназначен для тех, кто только начинает изучать математику.
+        state:
+          type: integer
+          description: Состояние курса (1 - Черновик, 2 - Доступен)
+          example: 1
+        categories:
+          type: array
+          items:
+            type: string
+          description: Категории курса
+          example: [ "Математика", "Образование" ]
+        default_passage_time:
+          type: integer
+          description: Время прохождения курса по умолчанию (в днях)
+          example: 30
+        lessons:
+          type: array
+          items:
+            type: integer
+          description: Уроки курса
+          example: [  ]
+  securitySchemes:
+    JWTAuth:
+      type: http
+      scheme: bearer

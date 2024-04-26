@@ -1,0 +1,54 @@
+[
+  {
+    "model": "models.user",
+    "pk": 1,
+    "fields": {
+      "name": "Admin",
+      "username": "admin",
+      "password": "pbkdf2_sha256$260000$qkh7bgMBeJ79vAnurJCoGg$q+CfEFXypSZE4aS3WZTaYAH0qFRIil5JPCbSpoxDf5Q=",
+      "role": 1,
+      "created_at": "2024-04-09T15:43:21.919000Z",
+      "updated_at": "2024-04-09T15:43:21.919000Z"
+    }
+  },
+  {
+    "model": "models.TestType",
+    "pk": 1,
+    "fields": {
+      "template": {"correct_answers": [0, 1], "answers": ["a", "b", "c"]},
+      "format": "options",
+      "created_at": "2024-04-09T15:43:21.919000Z",
+      "updated_at": "2024-04-09T15:43:21.919000Z"
+    }
+  },
+  {
+    "model": "models.TestType",
+    "pk": 2,
+    "fields": {
+      "template": {"right": ["a", "b", "c"], "left": ["k", "l", "m"]},
+      "format": "matching",
+      "created_at": "2024-04-09T15:43:21.919000Z",
+      "updated_at": "2024-04-09T15:43:21.919000Z"
+    }
+  },
+  {
+    "model": "models.TestType",
+    "pk": 3,
+    "fields": {
+      "template": {"answer": true},
+      "format": "true-false",
+      "created_at": "2024-04-09T15:43:21.919000Z",
+      "updated_at": "2024-04-09T15:43:21.919000Z"
+    }
+  },
+  {
+    "model": "models.TestType",
+    "pk": 4,
+    "fields": {
+      "template": {"right": ["a", "b", "c"], "left": {"k": 0, "l": 0, "m": 1}},
+      "format": "ratio",
+      "created_at": "2024-04-09T15:43:21.919000Z",
+      "updated_at": "2024-04-09T15:43:21.919000Z"
+    }
+  }
+]
