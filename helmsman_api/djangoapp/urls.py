@@ -2,6 +2,7 @@ from django.urls import path
 from .views import users
 from .views import groups
 from .views import courses
+from .views import notifications
 from .views.swagger import swagger
 
 urlpatterns = [
@@ -32,6 +33,14 @@ urlpatterns = [
     path('courses/my', courses.myCourses),                               # GET /courses/my - Получение списка курсов модератора или на которые подписан студент
     path('courses/<str:pk>', courses.getCourse),                         # GET /courses/<id> - Получение информации о курсе
     path('courses', courses.getCourses),                                 # GET /courses - Получение списка курсов
+	 
+    # Уведомления
+    path('notifications/create', notifications.createNotification),
+	# POST /notifications/create - Создание нового уведомления
+	path('notifications/my', notifications.getNotifications),
+	# GET /notifications/my - Уведомления, адресованные пользователю
+	path('notifications/read', notifications.readNotifications)
+	# DELETE /notifications/read - "Просмотр" и удаление уведомлений
 
     # Swagger
     path('', swagger),                                                   # Корневой URL для Swagger-документации
