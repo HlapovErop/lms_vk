@@ -9,7 +9,8 @@ from djangoapp.models.student_course import StudentCourse, CompletingStateEnum
 from djangoapp.models.user import User
 from djangoapp.models.user import UserRoleEnum
 from djangoapp.serializers.course_serializer import CourseSerializer
-from djangoapp.models.lesson import LessonTypeEnum
+from djangoapp.serializers.lesson_serializer import LessonSerializer
+from djangoapp.models.lesson import LessonTypeEnum, Lesson
 from djangoapp.models.test_type import TestType
 from djangoapp.serializers.lesson_serializer import LessonSerializer
 
@@ -48,16 +49,23 @@ def getCourses(request):
     serializer = CourseSerializer(courses, many=True)
     return Response(serializer.data)
 
-
 @api_view(['GET'])
 def getCourse(request, pk):
-    course = Course.objects.filter(id=pk)
+    try:
+        course = Course.objects.get(id=pk)
+    except Course.DoesNotExist:
+        return HttpResponseNotFound()
 
     if course.methodologist != request.user and course.state == CourseStateEnum.DRAFT:
         return HttpResponseNotFound()
 
-    serializer = CourseSerializer(course, many=False)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    lessons = Lesson.objects.filter(course=course)
+    course_serializer = CourseSerializer(course)
+    lessons_serializer = LessonSerializer(lessons, many=True)
+    course_data = course_serializer.data
+    course_data['lessons'] = lessons_serializer.data
+
+    return Response(course_data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -87,8 +95,6 @@ def updateCourse(request, pk):
         return Response(serializer.data, status=status.HTTP_200_OK)
     else:
         return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
-
-
 
 
 @api_view(['POST'])
