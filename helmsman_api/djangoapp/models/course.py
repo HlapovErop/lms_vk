@@ -4,10 +4,10 @@ from djangoapp.models.user import User
 from django.contrib.postgres.fields import ArrayField
 
 
-
 class CourseStateEnum:
     DRAFT = 1
     AVAILABLE = 2
+    ARCHIVED = 3
 
 
 class CourseManager(models.Manager):
@@ -20,7 +20,8 @@ class Course(models.Model):
     name = models.CharField(null=True, max_length=50)
     state = models.PositiveSmallIntegerField(choices=[
         (CourseStateEnum.DRAFT, 'Draft'),
-        (CourseStateEnum.AVAILABLE, 'Available')
+        (CourseStateEnum.AVAILABLE, 'Available'),
+        (CourseStateEnum.ARCHIVED, 'Archived'),
     ])
     categories = ArrayField(models.TextField(), blank=True, default=list)
     default_passage_time = models.IntegerField(null=True)

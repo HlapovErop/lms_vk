@@ -9,7 +9,7 @@ from djangoapp.models.group import Group
 from djangoapp.models.user import User
 from djangoapp.models.user import UserRoleEnum
 from djangoapp.serializers.user_serializer import UserSerializer
-from djangoapp.utils import generate_jwt_token
+from djangoapp.utils.decoders import generate_jwt_token
 
 
 @api_view(['POST'])
