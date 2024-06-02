@@ -39,7 +39,7 @@ urlpatterns = [
 	# POST /notifications/create - Создание нового уведомления
 	path('notifications/my', notifications.getNotifications),
 	# GET /notifications/my - Уведомления, адресованные пользователю
-	path('notifications/read', notifications.readNotifications)
+	path('notifications/read', notifications.readNotifications),
 	# DELETE /notifications/read - "Просмотр" и удаление уведомлений
 
     # Swagger
