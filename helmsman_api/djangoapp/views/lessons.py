@@ -1,8 +1,9 @@
 from django.http import HttpResponseForbidden, HttpResponseNotFound
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes
 from rest_framework.response import Response
 
+from djangoapp.authentication import JWTAuthentication
 from djangoapp.decorators import methodologist_required, student_required
 from djangoapp.models.course import Course, CourseStateEnum
 from djangoapp.models.student_course import StudentCourse, CompletingStateEnum
@@ -11,6 +12,7 @@ from djangoapp.models.user import UserRoleEnum
 from djangoapp.serializers.course_serializer import CourseSerializer
 
 @api_view(['GET'])
+@authentication_classes([JWTAuthentication])
 def getCourses(request):
     courses = Course.objects.filter(state=CourseStateEnum.AVAILABLE)
     serializer = CourseSerializer(courses, many=True)
@@ -18,6 +20,7 @@ def getCourses(request):
 
 
 @api_view(['GET'])
+@authentication_classes([JWTAuthentication])
 def getCourse(request, pk):
     course = Course.objects.filter(id=pk)
 
@@ -29,6 +32,7 @@ def getCourse(request, pk):
 
 
 @api_view(['POST'])
+@authentication_classes([JWTAuthentication])
 @methodologist_required
 def createCourse(request):
     request.data['methodologist_id'] = request.user.id
@@ -42,6 +46,7 @@ def createCourse(request):
 
 
 @api_view(['PUT'])
+@authentication_classes([JWTAuthentication])
 @methodologist_required
 def updateCourse(request, pk):
     course = User.objects.get(id=pk)
@@ -58,6 +63,7 @@ def updateCourse(request, pk):
 
 
 @api_view(['DELETE'])
+@authentication_classes([JWTAuthentication])
 @methodologist_required
 def deleteCourse(request, pk):
     course = Course.objects.get(id=pk)

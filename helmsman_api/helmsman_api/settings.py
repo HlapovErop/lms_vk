@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'djangoapp',
     'djangoapp.models',
+    'drf_yasg',
 ]
 
 SECRET_KEY = 'SECRET_KEY'
@@ -45,12 +46,6 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'helmsman_api.urls'
 
 SWAGGER_YAML_FILE = Path("djangoapp/swagger.yaml")
-
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'djangoapp.authentication.JWTAuthentication',
-    ),
-}
 
 TEMPLATES = [
     {

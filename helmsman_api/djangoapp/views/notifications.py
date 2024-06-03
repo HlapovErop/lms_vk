@@ -1,14 +1,15 @@
-# TODO Прочитать определённые уведомления
 from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
-from models.notification import Notification
-from serializers.notification_serializer import NotificationSerializer
+from djangoapp.models.notification import Notification
+from djangoapp.serializers.notification_serializer import NotificationSerializer
+from djangoapp.authentication import JWTAuthentication
 
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes
 from rest_framework.response import Response
 from rest_framework import status
 
 
 @api_view(['POST'])
+@authentication_classes([JWTAuthentication])
 def createNotification(request: HttpRequest) -> HttpResponse:
 	request.data['from_user'] = request.user.id
 	serializer = NotificationSerializer(data=request.data)
@@ -22,6 +23,7 @@ def createNotification(request: HttpRequest) -> HttpResponse:
 						status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 	
 @api_view(['GET'])
+@authentication_classes([JWTAuthentication])
 def getNotifications(request: HttpRequest) -> HttpResponse:
 	notifications = Notification.objects.filter(
 		to_user=request.user
@@ -30,6 +32,7 @@ def getNotifications(request: HttpRequest) -> HttpResponse:
 	return serializer.data
 
 @api_view(['DELETE'])
+@authentication_classes([JWTAuthentication])
 def readNotifications(request: HttpRequest) -> HttpResponse:
 	notification_ids = request.data.get('notification_ids', [])
 	if not notification_ids:

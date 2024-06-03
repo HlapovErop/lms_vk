@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swagger Editor</title>
+    <link rel="stylesheet" href="{% static 'swagger-editor/swagger-editor.css' %}">
+</head>
+<body>
+    <div id="swagger-editor"></div>
+    <script src="{% static 'swagger-editor/swagger-editor-bundle.js' %}"></script>
+    <script src="{% static 'swagger-editor/swagger-editor-standalone-preset.js' %}"></script>
+    <script>
+        SwaggerEditorBundle({
+            url: "/swagger.yaml",  // URL автогенерируемой схемы
+            dom_id: '#swagger-editor',
+            layout: "StandaloneLayout"
+        });
+    </script>
+</body>
+</html>

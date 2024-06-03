@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, authentication_classes
 from rest_framework.response import Response
 
+from djangoapp.authentication import JWTAuthentication
 from djangoapp.decorators import admin_required
 from djangoapp.models.group import Group
 from djangoapp.models.user import User
@@ -13,7 +14,6 @@ from djangoapp.utils.decoders import generate_jwt_token
 
 
 @api_view(['POST'])
-@authentication_classes([])
 def login(request):
     username = request.data.get('username')
     password = request.data.get('password')
@@ -38,6 +38,7 @@ def login(request):
 
 
 @api_view(['GET'])
+@authentication_classes([JWTAuthentication])
 def getUsers(request):
     if request.user.is_admin():
         users = User.objects.all()
@@ -55,6 +56,7 @@ def getUsers(request):
 
 
 @api_view(['GET'])
+@authentication_classes([JWTAuthentication])
 def getUser(request, pk):
     users = User.objects.get(id=pk)
     serializer = UserSerializer(users, many=False)
@@ -62,7 +64,6 @@ def getUser(request, pk):
 
 
 @api_view(['POST'])
-@authentication_classes([])
 def createUser(request):
     if request.data['role'] == UserRoleEnum.ADMIN and not request.user.is_admin():
         return HttpResponseForbidden({'error': 'you cannot set admin role'})
@@ -76,6 +77,7 @@ def createUser(request):
         return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 @api_view(['PUT'])
+@authentication_classes([JWTAuthentication])
 def updateUser(request, pk):
     user = User.objects.get(id=pk)
     if request.user.id != user.id and not request.user.is_admin():
@@ -94,6 +96,7 @@ def updateUser(request, pk):
 
 
 @api_view(['DELETE'])
+@authentication_classes([JWTAuthentication])
 @admin_required
 def deleteUser(request, pk):
     user = User.objects.get(id=pk)

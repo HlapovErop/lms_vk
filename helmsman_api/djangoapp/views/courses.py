@@ -1,8 +1,9 @@
 from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponseBadRequest
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes
 from rest_framework.response import Response
 
+from djangoapp.authentication import JWTAuthentication
 from djangoapp.decorators import methodologist_required, student_required
 from djangoapp.models.course import Course, CourseStateEnum
 from djangoapp.models.student_course import StudentCourse, CompletingStateEnum
@@ -15,6 +16,7 @@ from djangoapp.serializers.lesson_serializer import LessonSerializer
 
 
 @api_view(['POST'])
+@authentication_classes([JWTAuthentication])
 @student_required
 def syllabus(request, pk):
     course = Course.objects.filter(id=pk)
@@ -30,6 +32,7 @@ def syllabus(request, pk):
         return Response(status=status.HTTP_200_OK)
 
 @api_view(['GET'])
+@authentication_classes([JWTAuthentication])
 def myCourses(request):
     if request.user.ROLE == UserRoleEnum.STUDENT:
         student_courses = StudentCourse.objects.filter(student=request.user)
@@ -43,6 +46,7 @@ def myCourses(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
+@authentication_classes([JWTAuthentication])
 def getCourses(request):
     courses = Course.objects.filter(state=CourseStateEnum.AVAILABLE)
     serializer = CourseSerializer(courses, many=True)
@@ -50,6 +54,7 @@ def getCourses(request):
 
 
 @api_view(['GET'])
+@authentication_classes([JWTAuthentication])
 def getCourse(request, pk):
     course = Course.objects.filter(id=pk)
 
@@ -62,6 +67,7 @@ def getCourse(request, pk):
 
 @api_view(['POST'])
 @methodologist_required
+@authentication_classes([JWTAuthentication])
 def createCourse(request):
     request.data['methodologist_id'] = request.user.id
     serializer = CourseSerializer(data=request.data)
@@ -75,6 +81,7 @@ def createCourse(request):
 
 @api_view(['PUT'])
 @methodologist_required
+@authentication_classes([JWTAuthentication])
 def updateCourse(request, pk):
     course = User.objects.get(id=pk)
     if course.methodologist != request.user:
@@ -93,6 +100,7 @@ def updateCourse(request, pk):
 
 @api_view(['POST'])
 @methodologist_required
+@authentication_classes([JWTAuthentication])
 def addLesson(request, pk):
     course = Course.objects.filter(id=pk)
     course_lessons = course.lesson_ids
@@ -125,6 +133,7 @@ def addLesson(request, pk):
 
 @api_view(['DELETE'])
 @methodologist_required
+@authentication_classes([JWTAuthentication])
 def deleteCourse(request, pk):
     course = Course.objects.get(id=pk)
     if course.methodologist != request.user:

@@ -1,8 +1,9 @@
 from django.http import HttpResponseForbidden, HttpResponseNotFound
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
 
+from djangoapp.authentication import JWTAuthentication
 from djangoapp.decorators import teacher_required, teacher_or_admin_required
 from djangoapp.models.course import Course, CourseStateEnum
 from djangoapp.models.group import Group
@@ -12,6 +13,7 @@ from djangoapp.serializers.group_serializer import GroupSerializer
 
 
 @api_view(['GET'])
+@authentication_classes([JWTAuthentication])
 def getGroups(request):
     if request.user.role == UserRoleEnum.TEACHER:
         groups = Group.objects.filter(teacher=request.user)
@@ -27,6 +29,7 @@ def getGroups(request):
 
 
 @api_view(['GET'])
+@authentication_classes([JWTAuthentication])
 def getGroup(request, pk):
     group = Group.objects.get(pk=pk)
 
@@ -37,6 +40,7 @@ def getGroup(request, pk):
 
 
 @api_view(['POST'])
+@authentication_classes([JWTAuthentication])
 @teacher_required
 def createGroup(request):
     request.data['teacher_id'] = request.user.id
@@ -50,6 +54,7 @@ def createGroup(request):
 
 
 @api_view(['PUT'])
+@authentication_classes([JWTAuthentication])
 @teacher_or_admin_required
 def updateGroup(request, pk):
     group = Group.objects.get(id=pk)
@@ -66,6 +71,7 @@ def updateGroup(request, pk):
 
 
 @api_view(['POST'])
+@authentication_classes([JWTAuthentication])
 @teacher_required
 def addStudents(request, pk):
     group = Group.objects.get(id=pk)
@@ -81,6 +87,7 @@ def addStudents(request, pk):
 
 
 @api_view(['DELETE'])
+@authentication_classes([JWTAuthentication])
 @teacher_required
 def deleteStudents(request, pk):
     group = Group.objects.get(id=pk)
@@ -95,6 +102,7 @@ def deleteStudents(request, pk):
         return HttpResponseNotFound({'error': 'Students not found'})
 
 @api_view(['POST'])
+@authentication_classes([JWTAuthentication])
 @teacher_required
 def addCourses(request, pk):
     group = Group.objects.get(id=pk)
@@ -113,6 +121,7 @@ def addCourses(request, pk):
     return Response({'course': groupData(group), 'not_founded_courses': not_founded_courses}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
+@authentication_classes([JWTAuthentication])
 @teacher_required
 def deleteCourses(request, pk):
     group = Group.objects.get(id=pk)
@@ -131,6 +140,7 @@ def deleteCourses(request, pk):
     return Response({'course': groupData(group), 'not_founded_courses': not_founded_courses}, status=status.HTTP_200_OK)
 
 @api_view(['DELETE'])
+@authentication_classes([JWTAuthentication])
 @teacher_or_admin_required
 def deleteGroup(request, pk):
     group = Group.objects.get(id=pk)
