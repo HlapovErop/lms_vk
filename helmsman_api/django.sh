@@ -10,6 +10,7 @@ echo ====================================
 
 echo "Load seeds..."
 python manage.py loaddata initial_data.json
+python manage.py loaddata data_for_demonstration.json
 echo ====================================
 
 

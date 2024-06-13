@@ -1,0 +1,70 @@
+[
+  {
+    "model": "models.user",
+    "pk": 10,
+    "fields": {
+      "name": "Методист Методистович Метод",
+      "username": "methodologist",
+      "password": "pbkdf2_sha256$260000$qkh7bgMBeJ79vAnurJCoGg$q+CfEFXypSZE4aS3WZTaYAH0qFRIil5JPCbSpoxDf5Q=",
+      "role": 2,
+      "created_at": "2024-04-09T15:43:21.919000Z",
+      "updated_at": "2024-04-09T15:43:21.919000Z"
+    }
+  },
+  {
+    "model": "models.user",
+    "pk": 11,
+    "fields": {
+      "name": "Руководитель Группович Групп",
+      "username": "teacher",
+      "password": "pbkdf2_sha256$260000$qkh7bgMBeJ79vAnurJCoGg$q+CfEFXypSZE4aS3WZTaYAH0qFRIil5JPCbSpoxDf5Q=",
+      "role": 3,
+      "created_at": "2024-04-09T15:43:21.919000Z",
+      "updated_at": "2024-04-09T15:43:21.919000Z"
+    }
+  },
+  {
+    "model": "models.user",
+    "pk": 12,
+    "fields": {
+      "name": "Ученик Ученый Учен",
+      "username": "student",
+      "password": "pbkdf2_sha256$260000$qkh7bgMBeJ79vAnurJCoGg$q+CfEFXypSZE4aS3WZTaYAH0qFRIil5JPCbSpoxDf5Q=",
+      "role": 4,
+      "created_at": "2024-04-09T15:43:21.919000Z",
+      "updated_at": "2024-04-09T15:43:21.919000Z"
+    }
+  },
+  {
+    "model": "models.Group",
+    "pk": 10,
+    "fields": {
+      "name": "Группа, всем группам группа (ГВГГ)",
+      "teacher_id": 11,
+      "created_at": "2024-04-09T15:43:21.919000Z",
+      "updated_at": "2024-04-09T15:43:21.919000Z"
+    }
+  },
+  {
+    "model": "models.Group",
+    "pk": 10,
+    "fields": {
+      "name": "Группа, всем группам группа (ГВГГ)",
+      "teacher_id": 11,
+      "created_at": "2024-04-09T15:43:21.919000Z",
+      "updated_at": "2024-04-09T15:43:21.919000Z"
+    }
+  },
+  {
+    "model": "models.Course",
+    "pk": 10,
+    "fields": {
+      "name": "Курсный курс",
+      "state": 2,
+      "methodologist_id": 10,
+      "description": "Крутое описание курса, прочитав которое, ваша душа преисполнится, вы захотите его пройти и прорекламировать родственникам. Здесь вы научитесь всему необходимому для счастливой и беззаботной жизни.",
+      "created_at": "2024-04-09T15:43:21.919000Z",
+      "updated_at": "2024-04-09T15:43:21.919000Z"
+    }
+  }
+]

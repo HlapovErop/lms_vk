@@ -36,7 +36,7 @@
     "pk": 3,
     "fields": {
       "template": {"answer": true},
-      "format": "true-false",
+      "format": "true_false",
       "created_at": "2024-04-09T15:43:21.919000Z",
       "updated_at": "2024-04-09T15:43:21.919000Z"
     }

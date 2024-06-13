@@ -3,6 +3,9 @@ from rest_framework import status
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
 
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
 from djangoapp.authentication import JWTAuthentication
 from djangoapp.decorators import teacher_required, teacher_or_admin_required
 from djangoapp.models.course import Course, CourseStateEnum
@@ -12,6 +15,13 @@ from djangoapp.models.user import UserRoleEnum
 from djangoapp.serializers.group_serializer import GroupSerializer
 
 
+@swagger_auto_schema(
+    method='get',
+    responses={
+        200: openapi.Response('Successful retrieval of group list', GroupSerializer(many=True)),
+        403: openapi.Response('Forbidden')
+    }
+)
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 def getGroups(request):
@@ -27,7 +37,13 @@ def getGroups(request):
     return Response(serializer.data)
 
 
-
+@swagger_auto_schema(
+    method='get',
+    responses={
+        200: openapi.Response('Successful retrieval of group data', GroupSerializer()),
+        404: openapi.Response('Not Found')
+    }
+)
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
 def getGroup(request, pk):
@@ -39,6 +55,14 @@ def getGroup(request, pk):
         return HttpResponseNotFound({'error': 'You do not have permission to perform this action.'})
 
 
+@swagger_auto_schema(
+    method='post',
+    request_body=GroupSerializer,
+    responses={
+        201: openapi.Response('Group created successfully', GroupSerializer),
+        422: openapi.Response('Validation error')
+    }
+)
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @teacher_required
@@ -53,6 +77,15 @@ def createGroup(request):
         return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 
+@swagger_auto_schema(
+    method='put',
+    request_body=GroupSerializer,
+    responses={
+        200: openapi.Response('Group updated successfully', GroupSerializer),
+        403: openapi.Response('Forbidden'),
+        422: openapi.Response('Validation error')
+    }
+)
 @api_view(['PUT'])
 @authentication_classes([JWTAuthentication])
 @teacher_or_admin_required
@@ -70,6 +103,20 @@ def updateGroup(request, pk):
         return Response(serializer.errors, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 
+@swagger_auto_schema(
+    method='post',
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'student_ids': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Items(type=openapi.TYPE_INTEGER))
+        }
+    ),
+    responses={
+        200: openapi.Response('Students added successfully', GroupSerializer),
+        403: openapi.Response('Forbidden'),
+        404: openapi.Response('Students not found')
+    }
+)
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @teacher_required
@@ -78,7 +125,7 @@ def addStudents(request, pk):
     if request.user != group.teacher:
         return HttpResponseForbidden({'error': 'You cannot change this group'})
 
-    students_to_add = User.objects.filter(role=UserRoleEnum.STUDENT, id=request.data['student_ids'])
+    students_to_add = User.objects.filter(role=UserRoleEnum.STUDENT, id__in=request.data['student_ids'])
     if students_to_add:
         group.students.add(*students_to_add)
         return Response(groupData(group))
@@ -86,6 +133,20 @@ def addStudents(request, pk):
         return HttpResponseNotFound({'error': 'Students not found'})
 
 
+@swagger_auto_schema(
+    method='delete',
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'student_ids': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Items(type=openapi.TYPE_INTEGER))
+        }
+    ),
+    responses={
+        200: openapi.Response('Students deleted successfully', GroupSerializer),
+        403: openapi.Response('Forbidden'),
+        404: openapi.Response('Students not found')
+    }
+)
 @api_view(['DELETE'])
 @authentication_classes([JWTAuthentication])
 @teacher_required
@@ -94,13 +155,33 @@ def deleteStudents(request, pk):
     if request.user != group.teacher and not request.user.is_admin():
         return HttpResponseForbidden({'error': 'You cannot change this group'})
 
-    students_to_add = User.objects.filter(role=UserRoleEnum.STUDENT, id=request.data['student_ids'])
-    if students_to_add:
-        group.students.remove(*students_to_add)
+    students_to_delete = User.objects.filter(role=UserRoleEnum.STUDENT, id__in=request.data['student_ids'])
+    if students_to_delete:
+        group.students.remove(*students_to_delete)
         return Response(groupData(group))
     else:
         return HttpResponseNotFound({'error': 'Students not found'})
 
+
+@swagger_auto_schema(
+    method='post',
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'courses': openapi.Schema(
+                type=openapi.TYPE_ARRAY,
+                items=openapi.Items(type=openapi.TYPE_OBJECT, properties={
+                    'course_id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                    'passage_time': openapi.Schema(type=openapi.TYPE_STRING)
+                })
+            )
+        }
+    ),
+    responses={
+        200: openapi.Response('Courses added successfully', GroupSerializer),
+        403: openapi.Response('Forbidden')
+    }
+)
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @teacher_required
@@ -120,6 +201,20 @@ def addCourses(request, pk):
 
     return Response({'course': groupData(group), 'not_founded_courses': not_founded_courses}, status=status.HTTP_200_OK)
 
+
+@swagger_auto_schema(
+    method='post',
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'course_ids': openapi.Schema(type=openapi.TYPE_ARRAY, items=openapi.Items(type=openapi.TYPE_INTEGER))
+        }
+    ),
+    responses={
+        200: openapi.Response('Courses deleted successfully', GroupSerializer),
+        403: openapi.Response('Forbidden')
+    }
+)
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @teacher_required
@@ -139,6 +234,14 @@ def deleteCourses(request, pk):
 
     return Response({'course': groupData(group), 'not_founded_courses': not_founded_courses}, status=status.HTTP_200_OK)
 
+
+@swagger_auto_schema(
+    method='delete',
+    responses={
+        204: openapi.Response('Group deleted successfully'),
+        403: openapi.Response('Forbidden')
+    }
+)
 @api_view(['DELETE'])
 @authentication_classes([JWTAuthentication])
 @teacher_or_admin_required
@@ -150,7 +253,8 @@ def deleteGroup(request, pk):
 
     group.delete()
 
-    return Response('User successfully deleted!', status=status.HTTP_204_NO_CONTENT)
+    return Response('Group successfully deleted!', status=status.HTTP_204_NO_CONTENT)
+
 
 def groupData(group):
     group_serializer = GroupSerializer(group, many=False)

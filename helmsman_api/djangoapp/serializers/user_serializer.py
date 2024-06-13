@@ -17,3 +17,19 @@ class UserSerializer(serializers.ModelSerializer):
             validated_data['password'] = make_password(password)
 
         return super().create(validated_data)
+
+
+class SimpleUserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        exclude = ['temporary_code', 'created_at', 'updated_at', 'deleted_at', 'last_login']
+
+    def create(self, validated_data):
+        password = validated_data.pop('password', None)
+
+        if password:
+            validated_data['password'] = make_password(password)
+
+        return super().create(validated_data)

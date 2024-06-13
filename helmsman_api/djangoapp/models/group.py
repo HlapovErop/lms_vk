@@ -12,7 +12,7 @@ class GroupManager(models.Manager):
 class Group(models.Model):
     students = models.ManyToManyField(User, related_name='groups')
     teacher = models.ForeignKey(User, on_delete=models.CASCADE)
-    name = models.CharField(null=True, max_length=50)
+    name = models.CharField(null=True, max_length=250)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True, blank=True)

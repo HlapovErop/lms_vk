@@ -17,7 +17,7 @@ class CourseManager(models.Manager):
 
 class Course(models.Model):
     methodologist = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
-    name = models.CharField(null=True, max_length=50)
+    name = models.CharField(null=True, max_length=250)
     state = models.PositiveSmallIntegerField(choices=[
         (CourseStateEnum.DRAFT, 'Draft'),
         (CourseStateEnum.AVAILABLE, 'Available'),
