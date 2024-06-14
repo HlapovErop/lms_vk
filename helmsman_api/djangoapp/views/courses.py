@@ -16,6 +16,7 @@ from djangoapp.models.lesson import LessonTypeEnum, Lesson
 from djangoapp.models.test_type import TestType
 from djangoapp.serializers.lesson_serializer import LessonSerializer
 from djangoapp.serializers.test_serializer import TestSerializer
+from djangoapp.models.student_lesson import StudentLesson
 
 
 @swagger_auto_schema(
@@ -40,8 +41,14 @@ def syllabus(request, pk):
         course=course
     )
     if created:
-        student_course.state = CompletingStateEnum.START
+        student_course.state = CompletingStateEnum.ON_WAY
         student_course.save()
+        student_lesson, created = StudentLesson.objects.get_or_create(
+            student=request.user,
+            lesson=Lesson.objects.get(id=course.lesson_ids[0]),
+        )
+        if created:
+            student_lesson.state = StudentLesson.CompletingStateEnum
         return Response(status=status.HTTP_201_CREATED)
     else:
         return Response(status=status.HTTP_200_OK)
@@ -183,21 +190,16 @@ def updateCourse(request, pk):
 @methodologist_required
 @authentication_classes([JWTAuthentication])
 def addLesson(request, pk):
-    print('fchgvj')
     try:
         course = Course.objects.get(id=pk)
     except Course.DoesNotExist:
         return Response({'error': 'Course not found'}, status=status.HTTP_404_NOT_FOUND)
-    print('fchgvjryftyug')
 
     course_lessons = course.lesson_ids
     lesson_data = request.data['lesson']
-    lesson_index = 0
     lesson_data['course'] = course.id
-    print('fchgvjgfhkjkkghjk', lesson_data['type'])
 
     if lesson_data['type'] != LessonTypeEnum.FINAL_TEST:
-        print(request.data['lesson_index'])
         lesson_index = request.data['lesson_index']
         if lesson_index is None:
             return HttpResponseBadRequest({'error': 'lesson_index is missing'})
@@ -207,7 +209,6 @@ def addLesson(request, pk):
 
         if len(course_lessons) < lesson_index:
             return HttpResponseBadRequest({'error': 'You cannot add lesson to this lesson_index'})
-    print('fchgvjdcfjvgjbhkjnlkhgjvjfdh')
 
     if lesson_data['type'] == LessonTypeEnum.LECTURE:
         lesson_serializer = LessonSerializer(data=lesson_data)

@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'djangoapp',
+    'corsheaders',
     'djangoapp.models',
     'drf_yasg',
 ]
@@ -35,6 +36,8 @@ SECRET_KEY = 'SECRET_KEY'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -46,6 +49,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'helmsman_api.urls'
 
 SWAGGER_YAML_FILE = Path("djangoapp/swagger.yaml")
+CORS_ALLOW_ALL_ORIGINS = True
 
 TEMPLATES = [
     {
