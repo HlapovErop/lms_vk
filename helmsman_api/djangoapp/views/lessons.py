@@ -25,12 +25,13 @@ def getLesson(request, pk):
     except Lesson.DoesNotExist:
         return HttpResponseNotFound("{'error': 'Lesson not found'}")
     lesson_serializer = LessonSimpleSerializer(instance=lesson)
-
+    response_json = {'state': student_lesson.state, 'lesson': lesson_serializer.data}
     if lesson.test:
         test = lesson.test
         QuestionPreparator.prepare_question(test)
         test_serializer = TestSerializer(instance=test)
-    return Response({'status': student_lesson.state, 'lesson': lesson_serializer.data, 'test': test_serializer.data})
+        response_json['test'] = test_serializer.data
+    return Response(response_json)
 
 
 @api_view(['POST'])
