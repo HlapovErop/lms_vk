@@ -8,7 +8,7 @@ from drf_yasg import openapi
 from djangoapp.authentication import JWTAuthentication
 from djangoapp.decorators import methodologist_required, student_required
 from djangoapp.models.course import Course, CourseStateEnum
-from djangoapp.models.student_course import StudentCourse, CompletingStateEnum
+from djangoapp.models.student_course import StudentCourse, CompletingStateEnum as CompletingCourseStateEnum
 from djangoapp.models.user import User
 from djangoapp.models.user import UserRoleEnum
 from djangoapp.serializers.course_serializer import CourseSerializer, SimpleCourseSerializer
@@ -16,7 +16,7 @@ from djangoapp.models.lesson import LessonTypeEnum, Lesson
 from djangoapp.models.test_type import TestType
 from djangoapp.serializers.lesson_serializer import LessonSerializer
 from djangoapp.serializers.test_serializer import TestSerializer
-from djangoapp.models.student_lesson import StudentLesson
+from djangoapp.models.student_lesson import StudentLesson, CompletingStateEnum as CompletingLessonStateEnum
 
 
 @swagger_auto_schema(
@@ -38,17 +38,21 @@ def syllabus(request, pk):
 
     student_course, created = StudentCourse.objects.get_or_create(
         student=request.user,
-        course=course
+        course=course,
+        state=CompletingCourseStateEnum.ON_WAY
     )
     if created:
-        student_course.state = CompletingStateEnum.ON_WAY
-        student_course.save()
+        # student_course.state = CompletingStateEnum.ON_WAY
+        # student_course.save()
         student_lesson, created = StudentLesson.objects.get_or_create(
             student=request.user,
             lesson=Lesson.objects.get(id=course.lesson_ids[0]),
+            state=CompletingLessonStateEnum.ON_WAY,
+            attempt=0
         )
-        if created:
-            student_lesson.state = StudentLesson.CompletingStateEnum
+        # if created:
+        #     student_lesson.state = StudentLesson.CompletingStateEnum
+        #     student_lesson.save()
         return Response(status=status.HTTP_201_CREATED)
     else:
         return Response(status=status.HTTP_200_OK)
