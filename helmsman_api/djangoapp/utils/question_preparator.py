@@ -30,3 +30,8 @@ class QuestionPreparator:
     def matching(data):
         random.shuffle(data['left'])
         return data
+
+    @staticmethod
+    def placement(data):
+        random.shuffle(data['placement'])
+        return data
