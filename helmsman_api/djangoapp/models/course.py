@@ -26,7 +26,7 @@ class Course(models.Model):
     categories = ArrayField(models.TextField(), blank=True, default=list)
     default_passage_time = models.IntegerField(null=True)
     description = models.TextField(null=True)
-    lesson_ids = ArrayField(models.TextField(), blank=True, default=list)
+    lesson_ids = ArrayField(models.IntegerField(), blank=True, default=list)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True, blank=True)

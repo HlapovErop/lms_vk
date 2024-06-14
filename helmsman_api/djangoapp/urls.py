@@ -43,6 +43,7 @@ urlpatterns = [
     # Пользователи
     path(r'users/signup', users.createUser),  # POST /users/signup - Регистрация пользователя
     path(r'users/login', users.login),  # POST /users/login - Вход пользователя
+    path(r'users/profile', users.login),  # GET /users/profile - Получение данных для пользователя
     path(r'users/update/<str:pk>', users.updateUser),  # PUT /users/update/<id> - Обновление данных пользователя
     path(r'users/delete/<str:pk>', users.deleteUser),  # DELETE /users/delete/<id> - Удаление пользователя
     path(r'users/<str:pk>', users.getUser),  # GET /users/<id> - Получение информации о пользователе

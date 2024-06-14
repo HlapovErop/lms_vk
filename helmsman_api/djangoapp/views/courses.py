@@ -109,7 +109,11 @@ def getCourse(request, pk):
         return HttpResponseNotFound()
 
     serializer = SimpleCourseSerializer(course)
-    lessons = Lesson.objects.filter(course=course)
+
+    lessons = Lesson.objects.filter(id__in=course.lesson_ids)
+    lessons_dict = {lesson.id: lesson for lesson in lessons}
+    lessons = [lessons_dict[lesson_id] for lesson_id in course.lesson_ids if lesson_id in lessons_dict]
+
     return Response({'course': serializer.data, 'lessons': LessonSerializer(lessons, many=True).data}, status=status.HTTP_200_OK)
 
 
@@ -234,12 +238,8 @@ def addLesson(request, pk):
                 course.lesson_ids.insert(lesson_index, lesson_id)
                 course.save()
             else:
-                print(lesson_serializer.errors)
-                print(lesson_data)
                 return HttpResponseBadRequest("{'error': 'Bad lesson data'}")
         else:
-            print(test_serializer.errors)
-            print(test_serializer)
             return HttpResponseBadRequest("{'error': 'Bad test data'}")
 
     return Response(lesson_serializer.data, status=status.HTTP_201_CREATED)

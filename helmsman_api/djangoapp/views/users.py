@@ -112,6 +112,22 @@ def getUser(request, pk):
     return Response(serializer.data)
 
 
+
+@swagger_auto_schema(
+    method='get',
+    responses={
+        200: openapi.Response('Successful retrieval of user data', UserSerializer()),
+        403: openapi.Response('Forbidden'),
+    }
+)
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+def getProfile(request):
+    serializer = SimpleUserSerializer(request.user)
+
+    return Response(serializer.data)
+
+
 @swagger_auto_schema(
     method='post',
     request_body=UserSerializer,
