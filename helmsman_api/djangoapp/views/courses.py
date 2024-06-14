@@ -119,7 +119,7 @@ def getCourse(request, pk):
     if request.user.role == UserRoleEnum.STUDENT:
         student_lessons = StudentLesson.objects.filter(lesson_id__in=course.lesson_ids, student=request.user)
         for student_lesson in student_lessons:
-            lessons_dict[student_lesson.id]['state'] = student_lesson.state
+            lessons_dict[student_lesson.lesson.id]['state'] = student_lesson.state
 
     lessons = [lessons_dict[lesson_id] for lesson_id in course.lesson_ids if lesson_id in lessons_dict]
 
