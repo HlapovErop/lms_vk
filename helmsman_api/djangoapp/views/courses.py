@@ -111,10 +111,15 @@ def getCourse(request, pk):
     serializer = SimpleCourseSerializer(course)
 
     lessons = Lesson.objects.filter(id__in=course.lesson_ids)
-    lessons_dict = {lesson.id: lesson for lesson in lessons}
+    lessons_dict = {lesson.id: {'id': lesson.id, 'name': lesson.name} for lesson in lessons}
+    if request.user.role == UserRoleEnum.STUDENT:
+        student_lessons = StudentLesson.objects.filter(lesson_id__in=course.lesson_ids, student=request.user)
+        for student_lesson in student_lessons:
+            lessons_dict[student_lesson.id]['state'] = student_lesson.state
+
     lessons = [lessons_dict[lesson_id] for lesson_id in course.lesson_ids if lesson_id in lessons_dict]
 
-    return Response({'course': serializer.data, 'lessons': LessonSerializer(lessons, many=True).data}, status=status.HTTP_200_OK)
+    return Response({'course': serializer.data, 'lessons': lessons}, status=status.HTTP_200_OK)
 
 
 @swagger_auto_schema(
