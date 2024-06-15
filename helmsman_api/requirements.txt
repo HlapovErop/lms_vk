@@ -5,3 +5,4 @@ pyjwt
 PyYAML
 django-cors-headers
 drf-yasg
+deepdiff

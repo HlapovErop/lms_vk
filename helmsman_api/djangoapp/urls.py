@@ -76,7 +76,7 @@ urlpatterns = [
     path('courses', courses.getCourses),  # GET /courses - Получение списка курсов
 
     # Уроки
-    path('lessons/solve', lessons.solve), # POST /lessons/solve - Отправить решение курса
+    path('lessons/<str:pk>/solve', lessons.solve), # POST /lessons/solve - Отправить решение курса
     path('lessons/<str:pk>', lessons.getLesson),  # GET /lessons/<id> - Получение информации об уроке
 
     # Уведомления

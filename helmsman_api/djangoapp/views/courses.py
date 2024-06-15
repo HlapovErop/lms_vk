@@ -42,17 +42,13 @@ def syllabus(request, pk):
         state=CompletingCourseStateEnum.ON_WAY
     )
     if created:
-        # student_course.state = CompletingStateEnum.ON_WAY
-        # student_course.save()
         student_lesson, created = StudentLesson.objects.get_or_create(
             student=request.user,
             lesson=Lesson.objects.get(id=course.lesson_ids[0]),
             state=CompletingLessonStateEnum.ON_WAY,
             attempt=0
         )
-        # if created:
-        #     student_lesson.state = StudentLesson.CompletingStateEnum
-        #     student_lesson.save()
+
         return Response(status=status.HTTP_201_CREATED)
     else:
         return Response(status=status.HTTP_200_OK)

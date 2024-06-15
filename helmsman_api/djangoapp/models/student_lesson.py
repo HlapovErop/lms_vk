@@ -18,6 +18,7 @@ class StudentLesson(models.Model):
         (CompletingStateEnum.FAILED, 'Failed')
     ])
     attempt = models.PositiveSmallIntegerField()
+    last_answer = models.JSONField(blank=True, default=dict)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
