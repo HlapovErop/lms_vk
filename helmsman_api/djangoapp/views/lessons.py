@@ -48,19 +48,18 @@ def solve(request, pk):
     except Lesson.DoesNotExist:
         return HttpResponseNotFound("{'error': 'Lesson not found'}")
 
-    if lesson.type == LessonTypeEnum.LECTURE:
-        student_lesson.attempt += 1
-        open_next_lesson(lesson, request.user)
+    student_lesson.attempt += 1
 
-    if compare_json(lesson.test.template_data, request.data['template_data']):
+    if lesson.type == LessonTypeEnum.LECTURE:
         open_next_lesson(lesson, request.user)
-        student_lesson.state = CompletingStateEnum.FINISHED
-        student_lesson.attempt += 1
     else:
-        student_lesson.attempt += 1
-        student_lesson.last_answer = request.data['template_data']
-        if student_lesson.attempt == lesson.limit:
-            student_lesson.state = CompletingStateEnum.FAILED
+        if compare_json(lesson.test.template_data, request.data['template_data']):
+            open_next_lesson(lesson, request.user)
+            student_lesson.state = CompletingStateEnum.FINISHED
+        else:
+            student_lesson.last_answer = request.data['template_data']
+            if student_lesson.attempt == lesson.limit:
+                student_lesson.state = CompletingStateEnum.FAILED
     student_lesson.save()
 
     return Response({'state': student_lesson.state, 'lesson': LessonSimpleSerializer(instance=lesson).data},
