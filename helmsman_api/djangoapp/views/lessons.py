@@ -51,6 +51,7 @@ def solve(request, pk):
     student_lesson.attempt += 1
 
     if lesson.type == LessonTypeEnum.LECTURE:
+        student_lesson.state = CompletingStateEnum.FINISHED
         open_next_lesson(lesson, request.user)
     else:
         if compare_json(lesson.test.template_data, request.data['template_data']):
